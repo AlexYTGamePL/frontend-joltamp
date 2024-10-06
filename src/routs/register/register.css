@@ -27,8 +27,7 @@ body {
   border-radius: 10px;
   padding: 30px 40px;
 }
-
-.wrapper h1 {
+a .wrapper h1 {
   font-size: 36px;
   text-align: center;
 }
@@ -68,9 +67,6 @@ body {
 
 .input-box input:focus {
   border: 2px solid white;
-}
-
-.input-box input:focus {
   box-shadow: 0 0 5px white;
 }
 
@@ -123,4 +119,19 @@ body {
 
 .register-link p a:hover {
   text-decoration: underline;
+}
+
+.errorClass {
+  border: 2px solid #f5004ea1 !important;
+}
+.errorClass:focus {
+  border: 2px solid #f5004f !important;
+  box-shadow: 0 0 5px 1px #f5004f !important;
+}
+.noterrorClass {
+  border: 2px solid #0c9918a1 !important;
+}
+.noterrorClass:focus {
+  border: 2px solid #0c9918 !important;
+  box-shadow: 0 0 5px 1px #0c9918 !important;
 }
