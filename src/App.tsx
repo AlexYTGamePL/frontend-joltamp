@@ -1,12 +1,12 @@
 // App.tsx
-import 'bootstrap-icons/font/bootstrap-icons.css'; 
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import LoginSite from './routs/login/login.tsx';
-import RegisterSite from './routs/register/register.tsx';
-import WelcomeSite from './routs/welcome/welcome.tsx';
-import Site404 from './routs/404/404.tsx';
-import Panel from './routs/panel/panel.tsx';
+import "bootstrap-icons/font/bootstrap-icons.css";
+import React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import LoginSite from "./routes/login/login.tsx";
+import RegisterSite from "./routes/register/register.tsx";
+import WelcomeSite from "./routes/welcome/welcome.tsx";
+import Site404 from "./routes/404/404.tsx";
+import Panel from "./routes/panel/panel.tsx";
 
 function App() {
   return (
