@@ -1,6 +1,5 @@
 //import axios from 'axios';
-import React, { useState, useEffect } from "react";
-import MessageInput from "./components/MessageInput.tsx";
+import { useState, useEffect } from "react";
 import ChatPanel from "./components/ChatPanel.tsx";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -23,7 +22,7 @@ export default function Panel() {
           setUsername(res.data.username);
         }
       })
-      .catch((err) => {
+      .catch(() => {
         localStorage.removeItem("jwt");
         localStorage.removeItem("userId");
         navigate("/login");

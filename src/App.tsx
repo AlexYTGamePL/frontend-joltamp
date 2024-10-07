@@ -1,6 +1,5 @@
 // App.tsx
 import "bootstrap-icons/font/bootstrap-icons.css";
-import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import LoginSite from "./routes/login/login.tsx";
 import RegisterSite from "./routes/register/register.tsx";
