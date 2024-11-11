@@ -1,0 +1,117 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.body {
+  font-family: Arial, sans-serif;
+  background-color: #04011d;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  text-align: center;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.container {
+  max-width: 90%;
+  padding: 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.logo img {
+  width: 20vw;
+  max-width: 150px;
+  margin-bottom: 20px;
+}
+
+h1 {
+  font-size: 10vw;
+  max-width: 100%;
+  color: #bd0101;
+  margin: 0 auto;
+}
+
+h2 {
+  font-size: 3vw;
+  color: #777;
+  margin-bottom: 20px;
+}
+
+p {
+  font-size: 2vw;
+  color: #555;
+  margin-bottom: 40px;
+  max-width: 700px;
+  margin: 0 auto 40px;
+}
+
+.links a {
+  text-decoration: none;
+  color: #5865f2;
+  font-weight: bold;
+  margin: 0 10px;
+  font-size: 1.8vw;
+}
+
+.links a:hover {
+  text-decoration: underline;
+}
+
+.robot img {
+  width: 30vw;
+  max-width: 300px;
+  margin: 40px auto 0;
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 20vw;
+  }
+
+  h2 {
+    font-size: 6vw;
+  }
+
+  p {
+    font-size: 4.5vw;
+  }
+
+  .links a {
+    font-size: 4.5vw;
+  }
+
+  .robot img {
+    width: 50vw;
+    max-width: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 25vw;
+  }
+
+  h2 {
+    font-size: 7vw;
+  }
+
+  p {
+    font-size: 5vw;
+  }
+
+  .links a {
+    font-size: 5vw;
+  }
+
+  .robot img {
+    width: 60vw;
+    max-width: 200px;
+  }
+}

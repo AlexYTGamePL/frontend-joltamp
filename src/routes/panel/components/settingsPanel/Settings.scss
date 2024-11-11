@@ -1,0 +1,14 @@
+@import './../../panel.scss';
+
+.settings {
+  background-color: $bgc3;
+  height: 100%;
+  width: fit-content;
+  min-width: max(70%, 600px);
+  padding: 40px 20px 40px 20px;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+}

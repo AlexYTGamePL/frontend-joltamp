@@ -1,0 +1,69 @@
+$hoverc: #ffffff22;
+$bgc1: #202225;
+$bgc2: #2f3136;
+$bgc3: #36393f;
+$bgc4: #40444b;
+$fc1: white;
+$fc2: rgb(207, 207, 207);
+$fc3: #b9bbbe;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+
+  ::-webkit-scrollbar-track {
+    background: #00000022;
+  }
+  ::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: #00000055;
+    border-radius: 3px;
+    border: 1px solid #00000055;
+  }
+}
+
+.body {
+  display: flex;
+  height: 100vh;
+  font-family: 'Helvetica', sans-serif;
+  background-color: $bgc3;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 60px;
+  }
+  .left-panel {
+    width: 200px;
+  }
+  .main-content {
+    padding: 0.625rem;
+  }
+  .chat-section {
+    padding: 0.625rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar {
+    width: 50px;
+  }
+  .left-panel {
+    display: none;
+  }
+  .main-content {
+    padding: 0.3125rem;
+  }
+
+  .chat-input input {
+    min-width: 0;
+  }
+
+  .chat-input button[type='submit'] {
+    min-width: 0;
+  }
+}
