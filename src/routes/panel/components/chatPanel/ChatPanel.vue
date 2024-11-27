@@ -6,7 +6,7 @@ import { dataFriendsList } from '@/routes/panel/data/friends'
 
 import axios from 'axios'
 import { useRoute } from 'vue-router'
-import { onBeforeMount, ref, watch } from 'vue'
+import { onBeforeMount, ref, watch, onMounted, onUnmounted } from 'vue'
 
 // DefineStore variables
 const UserInfo = dataUserInfo()
@@ -14,75 +14,74 @@ const FriendsList = dataFriendsList()
 
 const route = useRoute()
 
-const displayName = ref("");
-const messages = ref<any[]>([]);
+const displayName = ref('')
+const messages = ref<any[]>([])
 
 const lastMessage = ref<any>()
 const oldestMessage = ref<any>(0)
 
-
 // Functions:
-
 
 //Scroll handle
 
-const handleScroll = (event:any) => {
-  const target = event.target;
-  const scrollPosition = Math.ceil(target.scrollTop  * (-1));
-  const maxScrollPosition = target.scrollHeight - target.clientHeight;
+const handleScroll = (event: any) => {
+  const target = event.target
+  const scrollPosition = Math.ceil(target.scrollTop * -1)
+  const maxScrollPosition = target.scrollHeight - target.clientHeight
 
   // Sprawdzenie, czy doscrollowano do samego dołu
-  if (scrollPosition  >= maxScrollPosition) {
+  if (scrollPosition >= maxScrollPosition) {
     loadMessages()
   }
-};
-
+}
 
 //Getting info about user
 const getInfo = () => {
-  axios.get(`${import.meta.env.VITE_BACKEND_ADDRESS}/users/getInfo/${route.params.id}`)
-  .then(response => {
-    displayName.value = response.data.displayname
-  })
+  axios
+    .get(`${import.meta.env.VITE_BACKEND_ADDRESS}/users/getInfo/${route.params.id}`)
+    .then((response) => {
+      displayName.value = response.data.displayname
+    })
 }
 
 //Loading messages to "messages" - wrong order, not splited
 const loadMessages = () => {
-  axios.post(`${import.meta.env.VITE_BACKEND_ADDRESS}/messages/`, {
-    latest: oldestMessage.value.SentAtTime,
-    target: route.params.id
-  },
-  {
-    headers: {
-      Authorization: localStorage.getItem("jwt")
-    }
-  }).then(response => {
-    if(response.data){
-      if (response.data[0]) oldestMessage.value = response.data[0]
-      messages.value = messages.value.concat(response.data.reverse())
-
-      groupMessages()
-    }
-  })
+  axios
+    .post(
+      `${import.meta.env.VITE_BACKEND_ADDRESS}/messages/`,
+      {
+        latest: oldestMessage.value.SentAtTime,
+        target: route.params.id
+      },
+      {
+        headers: {
+          Authorization: localStorage.getItem('jwt')
+        }
+      }
+    )
+    .then((response) => {
+      if (response.data) {
+        if (response.data[0]) oldestMessage.value = response.data[0]
+        messages.value = messages.value.concat(response.data.reverse())
+        groupMessages()
+      }
+    })
 }
 
 //Function checks time differences between previous message and current message, returns true/false
-const checkTimeDifferences = (previousMessage:any, currentMessage:any) => {
+const checkTimeDifferences = (previousMessage: any, currentMessage: any) => {
   const maxMessageDelay = 30000
 
-  if (previousMessage && previousMessage.SentBy == currentMessage.SentBy
-    && previousMessage.SentAt == currentMessage.SentAt
-    && ((currentMessage.SentAtTime - previousMessage.SentAtTime)  < maxMessageDelay) ){
-    return true
-  }
-  else{
-    return false
-  }
+  return !!(
+    previousMessage &&
+    previousMessage.SentBy == currentMessage.SentBy &&
+    previousMessage.SentAt == currentMessage.SentAt &&
+    currentMessage.SentAtTime - previousMessage.SentAtTime < maxMessageDelay
+  )
 }
 
 // Group messages depends on last message
-const groupMessages = () =>{
-
+const groupMessages = () => {
   lastMessage.value = {}
 
   messages.value.reverse()
@@ -90,8 +89,7 @@ const groupMessages = () =>{
   messages.value.forEach((x, index) => {
     if (checkTimeDifferences(lastMessage.value, x)) {
       messages.value[index].combineMessage = false
-    }
-    else{
+    } else {
       lastMessage.value = x
       messages.value[index].combineMessage = true
     }
@@ -100,72 +98,175 @@ const groupMessages = () =>{
 }
 
 //Show sent date
-function timeAgo(timestamp: number): string {
+function timeAgo(timestamp: number) {
   // Ensure timestamp is a valid number
   if (isNaN(timestamp)) {
-    return 'Invalid timestamp';
+    return 'Invalid timestamp'
   }
 
-  const now = Date.now(); // Current timestamp
-  const diffInMs = now - timestamp;
-  const diffInSec = diffInMs / 1000;
-  const diffInMin = diffInSec / 60;
-  const diffInHours = diffInMin / 60;
-  const diffInDays = diffInHours / 24;
+  const now = Date.now() // Current timestamp
+  const diffInMs = now - timestamp
+  const diffInSec = diffInMs / 1000
+  const diffInMin = diffInSec / 60
+  const diffInHours = diffInMin / 60
+  const diffInDays = diffInHours / 24
 
   if (diffInDays < 1) {
     // Less than 24 hours ago
     if (diffInHours < 1) {
-      if(diffInMin < 1)
-        return `Now`;
-      else{
-        return `${Math.floor(diffInMin)} minutes ago`;
+      if (diffInMin < 1) return `Now`
+      else {
+        return `${Math.floor(diffInMin)} minutes ago`
       }
     } else {
-      return `${Math.floor(diffInHours)} hours ago`;
+      return `${Math.floor(diffInHours)} hours ago`
     }
   } else if (diffInDays < 2) {
     // Yesterday
-    return 'yesterday';
+    return 'yesterday'
   } else {
     // More than 1 day ago
-    return `${Math.floor(diffInDays)} days ago`;
+    return `${Math.floor(diffInDays)} days ago`
   }
 }
-
-
 
 // Catching changes in route.params.id
 watch(
   () => route.params.id,
   async (newId, oldId) => {
     if (newId !== oldId) {
-      messages.value = []; // Reset messages when route id changes
+      messages.value = [] // Reset messages when route id changes
       oldestMessage.value = {}
-      await getInfo();  // Reset info about user
-      await loadMessages();
+      await getInfo() // Reset info about user
+      await loadMessages()
     }
   }
-);
+)
 
-const addMessage = (message:any) =>{
-
-  messages.value.unshift({ ...message, combineMessage: !checkTimeDifferences(lastMessage.value, message)});
+const addMessage = (message: any) => {
+  messages.value.unshift({
+    ...message,
+    combineMessage: !checkTimeDifferences(lastMessage.value, message)
+  })
   lastMessage.value = message
 }
 
-
 //Before Mound
 onBeforeMount(() => {
-  getInfo();
-  loadMessages();
+  getInfo()
+  loadMessages()
 
   FriendsList.refreshFriendsList()
 
   setInterval(() => {
     // Trigger a re-render every minute
-    messages.value = [...messages.value];
-  }, 60000);
+    messages.value = [...messages.value]
+  }, 60000)
+})
+
+//Context menu
+const showContextMenu = ref(true)
+const mousePosition = ref<{ x: number; y: number }>({ x: 0, y: 0 })
+const contextMenuMessageId = ref<String>("")
+const menuHeight = ref<number>(10)
+const menuWidth = ref<number>(10)
+
+const openContextMenu = (event: any, targetid: String) => {
+  console.log("klik")
+  contextMenuMessageId.value = targetid;
+
+  // Coursor position
+  mousePosition.value = { x: event.clientX, y: event.clientY };
+  // Make sure that context menu is not outside the screen
+  const contextMenuMargin:number = 10;
+
+  if (mousePosition.value.x + menuWidth.value > window.innerWidth) mousePosition.value.x = window.innerWidth - menuWidth.value - contextMenuMargin;
+  if (mousePosition.value.y + menuHeight.value > window.innerHeight) mousePosition.value.y = window.innerHeight - menuHeight.value - contextMenuMargin;
+  if (mousePosition.value.x < 0) mousePosition.value.x = contextMenuMargin;
+  if (mousePosition.value.y < 0) mousePosition.value.y = contextMenuMargin;
+
+  // Making context menu visible
+  showContextMenu.value = true;
+}
+
+//hide context menu
+function closeContextMenu() {
+  showContextMenu.value = false
+}
+
+onMounted(() => {
+  document.addEventListener('click', closeContextMenu)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', closeContextMenu)
+})
+
+
+
+//input element
+
+const replyMessageData = ref<any>()
+const editMessageData = ref<any>()
+const isInputFocused = ref(false)
+
+function addReaction() {
+  console.log('add reaction')
+}
+
+function replyMessage(replyMessageId:String) {
+  replyMessageData.value = messages.value.find(
+    (message) => message.MessageId === replyMessageId
+  );
+  //IdOfTheUpdate is used to make sure that watch function always will react for changes
+  isInputFocused.value = true
+  //console.log(editMessageData.value)
+}
+
+const editMessage = (editMessageId:String) => {
+  editMessageData.value = messages.value.find(
+    (message) => message.MessageId === editMessageId
+  );
+  //console.log(editMessageData.value)
+}
+
+const deleteMessage = (deleteMessageId:String) => {
+  const messageToDelete:any = messages.value.find((message) => message.MessageId === deleteMessageId)
+
+  axios
+    .post(
+      `${import.meta.env.VITE_BACKEND_ADDRESS}/messages/delete`,
+      {
+        target: route.params.id,
+        sentat: messageToDelete.SentAt,
+        sentattime: messageToDelete.SentAtTime,
+        message: deleteMessageId
+      },
+      {
+        headers: {
+          Authorization: localStorage.getItem('jwt')
+        }
+      }
+    )
+    .then((res) => {
+      if (res.status == 200) {
+        messages.value = messages.value.filter((message) => message.MessageId !== deleteMessageId)
+        groupMessages()
+      }
+    })
+    .catch((err)=>{
+      console.error(err)
+    })
+}
+
+//Before Mound
+onMounted(() => {
+  // Size of context menu
+  const contextmenu = document.getElementById('context-menu');
+  menuWidth.value = contextmenu?.clientWidth ?? 0;
+  menuHeight.value = contextmenu?.clientHeight ?? 0;
+
+  showContextMenu.value = false
 })
 
 </script>
@@ -193,18 +294,37 @@ onBeforeMount(() => {
         </div>
       </div>
       <hr />
-      <div class="chat-window" @scroll="handleScroll">
+      <div class="chat-window" @scroll="handleScroll" @contextmenu.prevent="">
         <MessageContent
           v-for="message in messages"
           :key="message.MessageId"
+          :id="message.MessageId"
+          :reply="message.ReplyBody"
           imgUrl="https://via.placeholder.com/40"
           :nickname="message.SentBy == UserInfo.user_id ? UserInfo.displayname : displayName"
           :sentDate="timeAgo(message.SentAtTime)"
           :content="message.Content"
           :combineMessage="message.combineMessage"
+          :edited="message.edited"
+          @contextmenu.prevent="openContextMenu($event, message.MessageId)"
         />
+
+        <!-- Menu kontekstowe -->
+        <div
+          class="context-menu"
+          id="context-menu"
+          v-if="showContextMenu"
+          :style="{ top: `${mousePosition.y}px`, left: `${mousePosition.x}px` }"
+        >
+          <ul>
+            <li @click="addReaction">Add reaction</li>
+            <li @click="replyMessage(contextMenuMessageId)">Reply</li>
+            <li @click="editMessage(contextMenuMessageId)">Edit Message</li>
+            <li @click="deleteMessage(contextMenuMessageId)">Delete Message</li>
+          </ul>
+        </div>
       </div>
-      <MessageInput :addMessage="addMessage" />
+      <MessageInput :addMessage="addMessage" :editMessage="editMessageData" :replyMessage="replyMessageData" :isFocused="isInputFocused" />
     </div>
   </div>
 </template>
@@ -215,7 +335,6 @@ onBeforeMount(() => {
 * {
   box-sizing: border-box;
 }
-
 
 .main-content {
   flex: 1;
@@ -276,6 +395,34 @@ onBeforeMount(() => {
     }
     ::-webkit-scrollbar {
       width: 8px;
+    }
+  }
+}
+
+.context-menu {
+  position: absolute;
+  background-color: #333;
+  border: 1px solid #555;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  padding: 10px;
+  z-index: 1000;
+  width: 200px;
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+      color: white;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 14px;
+
+      &:hover {
+        background-color: #444;
+      }
     }
   }
 }
